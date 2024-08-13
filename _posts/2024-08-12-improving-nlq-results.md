@@ -77,13 +77,13 @@ provided by Dataherald:
 
 #### Question 1: "Display population growth in Britain" ✔️
 
-```sql
+{% highlight sql %}
 -- Display population growth in the United Kingdom
 SELECT year, total
 FROM population_data
 WHERE region_id = 75
 ORDER BY year;
-```
+{% endhighlight %}
 
 |year|total   |
 |----|-------:|
@@ -100,14 +100,14 @@ but it's correct.
 
 #### Question 2: "Show me a line chart with the global population from 1980 onwards" ✘
 
-```sql
+{% highlight sql %}
 -- Select the year and total population from the population_data table
 -- Filter the results to include only the years from 1980 onwards
 SELECT year, total
 FROM public.population_data
 WHERE year >= 1980
 ORDER BY year;
-```
+{% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -121,12 +121,12 @@ region and year from 1980 onwards, not just the total **global** population.
 
 #### Question 3: "How many centarians were there in the world in 2020?" ✘
 
-```sql
+{% highlight sql %}
 -- SQL query to find the number of centenarians in the world in 2020
 SELECT SUM(age_over_100) AS centenarians_2020
 FROM population_data
 WHERE year = 2020;
-```
+{% endhighlight %}
 
 |centenarians_2020|
 |----------------:|
@@ -140,7 +140,7 @@ deliberate misspelling of 'centenarians'.
 
 #### Question 4: "Compare US population vs China population 1970-2010" ✔️
 
-```sql
+{% highlight sql %}
 -- Compare the population of the US and China from 1970 to 2010
 SELECT
     year,
@@ -154,7 +154,7 @@ GROUP BY
     year
 ORDER BY
     year;
-```
+{% endhighlight %}
 
 |year|china_population|us_population|
 |----|----------------|-------------|
@@ -176,13 +176,13 @@ of the tables and columns.
 
 #### Question 1: "Display population growth in Britain" ✔️
 
-```sql
+{% highlight sql %}
 -- Display population growth in Britain (United Kingdom)
 SELECT year, total
 FROM public.population_data
 WHERE region_id = 75
 ORDER BY year;
-```
+{% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -197,14 +197,14 @@ Britain.
 
 #### Question 2: "Show me a line chart with the global population from 1980 onwards" ✘
 
-```sql
+{% highlight sql %}
 -- Select the year and the sum of the total population for each year from 1980 onwards
 SELECT year, SUM(total) AS global_population
 FROM population_data
 WHERE year >= 1980
 GROUP BY year
 ORDER BY year;
-```
+{% endhighlight %}
 
 |year|global_population|
 |----|----------------:|
@@ -218,12 +218,12 @@ the total population of all defined regions, not just the global population.
 
 #### Question 3: "How many centarians were there in the world in 2020?" ✘
 
-```sql
+{% highlight sql %}
 -- SQL query to find the number of centenarians in the world in 2020
 SELECT SUM(age_over_100) AS centenarians_2020
 FROM public.population_data
 WHERE year = 2020;
-```
+{% endhighlight %}
 
 |centenarians_2020|
 |----------------:|
@@ -235,7 +235,7 @@ get an accurate answer.
 
 #### Question 4: "Compare US population vs China population 1970-2010" ✔️
 
-```sql
+{% highlight sql %}
 -- Compare the population of the US and China from 1970 to 2010
 SELECT
     year,
@@ -249,7 +249,7 @@ GROUP BY
     year
 ORDER BY
     year;
-```
+{% endhighlight %}
 
 |year|china_population|us_population|
 |----|---------------:|------------:|
@@ -270,19 +270,19 @@ Previously we'd only told Dataherald that the `region_id` column was a foreign
 key to the `region` table, but we hadn't give it any further information. Let's
 add this description and see if it helps:
 
-```json
+{% endhighlight %}json
 "description": "The ID of the region which this information relates to. This relates to entries in the region table, and may be an individual country, a group of countries, north or south hemisphere, or the entire world."
-```
+{% endhighlight %}
 
 ### Question 1: "Display population growth in Britain" ✔️
 
-```sql
+{% highlight sql %}
 -- Retrieve the population growth in the United Kingdom
 SELECT year, total
 FROM public.population_data
 WHERE region_id = 75
 ORDER BY year;
-```
+{% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -299,13 +299,13 @@ We could probably address this using another Golden SQL.
 
 ### Question 2: "Show me a line chart with the global population from 1980 onwards" ✔️
 
-```sql
+{% highlight sql %}
 -- Retrieve global population data from 1980 onwards for the region_id corresponding to "World"
 SELECT year, total
 FROM public.population_data
 WHERE region_id = 164 AND year >= 1980
 ORDER BY year;
-```
+{% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -321,12 +321,12 @@ regions, and it understands that the global population is represented by the
 
 ### Question 3: "How many centarians were there in the world in 2020?" ✘
 
-```sql
+{% highlight sql %}
 -- SQL query to find the number of centenarians in the world in 2020
 SELECT SUM(age_over_100) AS centenarians_2020
 FROM public.population_data
 WHERE year = 2020;
-```
+{% endhighlight %}
 
 |centenarians_2020|
 |----------------:|
@@ -338,7 +338,7 @@ give an appropriate example.
 
 ### Question 4: "Compare US population vs China population 1970-2010" ✔️
 
-```sql
+{% highlight sql %}
 -- Compare the population of the US and China from 1970 to 2010
 SELECT
     year,
@@ -352,7 +352,7 @@ GROUP BY
     year -- Group by year to get annual population data
 ORDER BY
     year; -- Order the results by year
-```
+{% endhighlight %}
 
 |year|china_population|us_population|
 |----|---------------:|------------:|
@@ -375,13 +375,13 @@ relationship between tables, by means of a Golden SQL statement.
 > of the 1970s?*
 >
 > Answer:
-> ```sql
+> {% highlight sql %}
 > select year, (pd.age_under_15::decimal / pd.total) * 100 as percent_under_15 from public.population_data pd inner join public.region r on pd.region_id = r.id and name = 'World' where year between 1970 and 1979;
-> ```
+> {% endhighlight %}
 
 #### Question 1: "Display population growth in Britain" ✔️
 
-```sql
+{% highlight sql %}
 -- Select the year and total population for the United Kingdom to display population growth
 SELECT
     pd.year,
@@ -396,7 +396,7 @@ WHERE
     r.name = 'United Kingdom'
 ORDER BY
     pd.year;
-```
+{% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -411,7 +411,7 @@ likely to be a more efficient method for more complicated scenarios.
 
 #### Question 2: "Show me a line chart with the global population from 1980 onwards" ✔️
 
-```sql
+{% highlight sql %}
 -- Select the year and total population from 1980 onwards for the global population
 SELECT
     pd.year,
@@ -427,7 +427,7 @@ WHERE
     AND pd.year >= 1980
 ORDER BY
     pd.year;
-```
+{% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -442,13 +442,13 @@ the 'World' region.
 
 #### Question 3: "How many centarians were there in the world in 2020?" ✔️
 
-```sql
+{% highlight sql %}
 -- Select the number of centenarians in the world in 2020
 SELECT pd.age_over_100
 FROM public.population_data pd
 INNER JOIN public.region r ON pd.region_id = r.id
 WHERE r.name = 'World' AND pd.year = 2020;
-```
+{% endhighlight %}
 
 |age_over_100|
 |-----------:|
@@ -460,7 +460,7 @@ region in 2020.
 
 #### Question 4: "Compare US population vs China population 1970-2010" ✘
 
-```sql
+{% highlight sql %}
 -- SQL query to compare the populations of the US and China from 1970 to 2010
 SELECT
     r.name AS country,
@@ -477,7 +477,7 @@ WHERE
     AND pd.year BETWEEN 1970 AND 2010
 ORDER BY
     pd.year, r.name;
-```
+{% endhighlight %}
 
 |country|year|population|
 |-------|----|---------:|
