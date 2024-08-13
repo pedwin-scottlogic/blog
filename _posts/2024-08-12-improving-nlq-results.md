@@ -84,6 +84,7 @@ FROM population_data
 WHERE region_id = 75
 ORDER BY year;
 ```
+
 |year|total   |
 |----|-------:|
 |1950|50055068|
@@ -107,6 +108,7 @@ FROM public.population_data
 WHERE year >= 1980
 ORDER BY year;
 ```
+
 |year|total|
 |----|----:|
 |1980|5736092|
@@ -125,6 +127,7 @@ SELECT SUM(age_over_100) AS centenarians_2020
 FROM population_data
 WHERE year = 2020;
 ```
+
 |centenarians_2020|
 |----------------:|
 |3088375|
@@ -152,6 +155,7 @@ GROUP BY
 ORDER BY
     year;
 ```
+
 |year|china_population|us_population|
 |----|----------------|-------------|
 |1970|822534460.0     |200328340.0  |
@@ -179,6 +183,7 @@ FROM public.population_data
 WHERE region_id = 75
 ORDER BY year;
 ```
+
 |year|total|
 |----|----:|
 |1950|50055068|
@@ -200,6 +205,7 @@ WHERE year >= 1980
 GROUP BY year
 ORDER BY year;
 ```
+
 |year|global_population|
 |----|----------------:|
 |1980|28185725937.0|
@@ -218,6 +224,7 @@ SELECT SUM(age_over_100) AS centenarians_2020
 FROM public.population_data
 WHERE year = 2020;
 ```
+
 |centenarians_2020|
 |----------------:|
 |3088375|
@@ -243,6 +250,7 @@ GROUP BY
 ORDER BY
     year;
 ```
+
 |year|china_population|us_population|
 |----|---------------:|------------:|
 |1970|822534460.0|200328340.0|
@@ -261,6 +269,7 @@ affected the resulting query.
 Previously we'd only told Dataherald that the `region_id` column was a foreign
 key to the `region` table, but we hadn't give it any further information. Let's
 add this description and see if it helps:
+
 ```json
 "description": "The ID of the region which this information relates to. This relates to entries in the region table, and may be an individual country, a group of countries, north or south hemisphere, or the entire world."
 ```
@@ -274,6 +283,7 @@ FROM public.population_data
 WHERE region_id = 75
 ORDER BY year;
 ```
+
 |year|total|
 |----|----:|
 |1950|50055068|
@@ -296,6 +306,7 @@ FROM public.population_data
 WHERE region_id = 164 AND year >= 1980
 ORDER BY year;
 ```
+
 |year|total|
 |----|----:|
 |1980|4444008000|
@@ -316,6 +327,7 @@ SELECT SUM(age_over_100) AS centenarians_2020
 FROM public.population_data
 WHERE year = 2020;
 ```
+
 |centenarians_2020|
 |----------------:|
 |3088375|
@@ -341,6 +353,7 @@ GROUP BY
 ORDER BY
     year; -- Order the results by year
 ```
+
 |year|china_population|us_population|
 |----|---------------:|------------:|
 |1970|822534460.0|200328340.0|
@@ -384,6 +397,7 @@ WHERE
 ORDER BY
     pd.year;
 ```
+
 |year|total|
 |----|----:|
 |1950|50055068|
@@ -414,6 +428,7 @@ WHERE
 ORDER BY
     pd.year;
 ```
+
 |year|total|
 |----|----:|
 |1980|4444008000 |
@@ -434,6 +449,7 @@ FROM public.population_data pd
 INNER JOIN public.region r ON pd.region_id = r.id
 WHERE r.name = 'World' AND pd.year = 2020;
 ```
+
 |age_over_100|
 |-----------:|
 |547543|
@@ -462,6 +478,7 @@ WHERE
 ORDER BY
     pd.year, r.name;
 ```
+
 |country|year|population|
 |-------|----|---------:|
 |China  |1970|822534460|
