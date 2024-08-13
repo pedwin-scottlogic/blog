@@ -375,10 +375,8 @@ relationship between tables, by means of a Golden SQL statement.
 > of the 1970s?*
 >
 > Answer:
+> ```select year, (pd.age_under_15::decimal / pd.total) * 100 as percent_under_15 from public.population_data pd inner join public.region r on pd.region_id = r.id and name = 'World' where year between 1970 and 1979;```
 >
-> {% highlight sql %}
-> select year, (pd.age_under_15::decimal / pd.total) * 100 as percent_under_15 from public.population_data pd inner join public.region r on pd.region_id = r.id and name = 'World' where year between 1970 and 1979;
-> {% endhighlight %}
 >
 
 #### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
