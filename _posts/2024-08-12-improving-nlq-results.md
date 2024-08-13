@@ -75,7 +75,7 @@ provided by Dataherald:
 
 ### Round 1: Schema scan only
 
-#### Question 1: "Display population growth in Britain" <font color='green'>✔️</font>
+#### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Display population growth in the United Kingdom
@@ -138,7 +138,7 @@ counting centenarians in each country, plus counting them again as members of a
 group of countries, continents, world… still, at least it's coped with our
 deliberate misspelling of 'centenarians'.
 
-#### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔️</font>
+#### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Compare the population of the US and China from 1970 to 2010
@@ -174,7 +174,7 @@ year for each of the requested countries.
 Let's see if we get better answers by giving Dataherald some basic descriptions
 of the tables and columns.
 
-#### Question 1: "Display population growth in Britain" <font color='green'>✔️</font>
+#### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Display population growth in Britain (United Kingdom)
@@ -233,7 +233,7 @@ Apart from the inclusion of the schema name, this is exactly the same as before.
 We still need to provide some more information about this kind of question to
 get an accurate answer.
 
-#### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔️</font>
+#### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Compare the population of the US and China from 1970 to 2010
@@ -274,7 +274,7 @@ add this description and see if it helps:
 "description": "The ID of the region which this information relates to. This relates to entries in the region table, and may be an individual country, a group of countries, north or south hemisphere, or the entire world."
 {% endhighlight %}
 
-### Question 1: "Display population growth in Britain" <font color='green'>✔️</font>
+### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Retrieve the population growth in the United Kingdom
@@ -297,7 +297,7 @@ for more complicated questions or more generic answers, we'd probably prefer
 that the query used a `JOIN` rather than looking up the `region_id` separately.
 We could probably address this using another Golden SQL.
 
-### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='green'>✔️</font>
+### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Retrieve global population data from 1980 onwards for the region_id corresponding to "World"
@@ -336,7 +336,7 @@ Despite getting the answer to Question 2 correct now, we're still getting the
 same incorrect answer here. Hopefully a Golden SQL will help with this, if we
 give an appropriate example.
 
-### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔️</font>
+### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Compare the population of the US and China from 1970 to 2010
@@ -379,7 +379,7 @@ relationship between tables, by means of a Golden SQL statement.
 >     select year, (pd.age_under_15::decimal / pd.total) * 100 as percent_under_15 from public.population_data pd inner join public.region r on pd.region_id = r.id and name = 'World' where year between 1970 and 1979;
 >     {% endhighlight %}
 
-#### Question 1: "Display population growth in Britain" <font color='green'>✔️</font>
+#### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Select the year and total population for the United Kingdom to display population growth
@@ -409,7 +409,7 @@ Excellent. We're still getting a valid answer, but now it's using a `JOIN` to
 find the appropriate `region_id` rather than looking it up separately. This is
 likely to be a more efficient method for more complicated scenarios.
 
-#### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='green'>✔️</font>
+#### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Select the year and total population from 1980 onwards for the global population
@@ -440,7 +440,7 @@ Another good improvement. We're still getting a correct answer, but this has
 also been changed to utilise a `JOIN` to find the appropriate `region_id` for
 the 'World' region.
 
-#### Question 3: "How many centarians were there in the world in 2020?" <font color='green'>✔️</font>
+#### Question 3: "How many centarians were there in the world in 2020?" <font color='green'>✔</font>
 
 {% highlight sql %}
 -- Select the number of centenarians in the world in 2020
