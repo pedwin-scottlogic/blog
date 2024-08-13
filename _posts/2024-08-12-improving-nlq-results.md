@@ -270,9 +270,7 @@ Previously we'd only told Dataherald that the `region_id` column was a foreign
 key to the `region` table, but we hadn't give it any further information. Let's
 add this description and see if it helps:
 
-{% highlight json %}
-"description": "The ID of the region which this information relates to. This relates to entries in the region table, and may be an individual country, a group of countries, north or south hemisphere, or the entire world."
-{% endhighlight %}
+```"description": "The ID of the region which this information relates to. This relates to entries in the region table, and may be an individual country, a group of countries, north or south hemisphere, or the entire world."```
 
 ### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
