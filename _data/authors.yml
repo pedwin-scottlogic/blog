@@ -109,6 +109,7 @@ active-authors:
   - osouthwell
   - pchamberlin
   - pdykes
+  - pedwin-scottlogic
   - pgraham
   - pling
   - rbeckett
@@ -470,7 +471,7 @@ authors:
     picture: picture.jpg
   hsauve:
     author-summary: "I'm an Associate Developer at Scott Logic based in the Bristol office. My background is in Languages and Marketing."
-    feed-description: 
+    feed-description:
     name: "Hélène Sauvé"
     picture: helene-sauve-picture.jpg
   ilapworth:
@@ -1509,3 +1510,14 @@ authors:
     email: rvgoethem@scottlogic.com
     author-summary: "I am a Lead Dev in the Edinburgh office. I take ideas, add a dash of design, a sprinkle of code, et voilà!"
     picture: picture.png
+  pedwin-scottlogic:
+    name: "Paul Edwin"
+    email: pedwin@scottlogic.com
+    author-summary: >
+      <p>Lead Developer at Scott Logic, based in Newcastle. Nearly 30 years
+      of commercial software development experience, half of those with Scott
+      Logic.</p>
+
+      <p>Away from the keyboard, I'm often found running or on two wheels, or
+      dragging my dog to the pub for "rehydration". 🐕🏃🚵‍♂️🏍️🍺</p>
+    picture: profile00.jpg
