@@ -14,10 +14,16 @@ tags:
 # Improving natural language query results
 
 Getting useful information from databases can be difficult if you're not
-familiar with SQL (Structured Query Language). With the increase in popularity
-of AI, there are now several tools available which can use AI to take a natural
-language query (e.g. "What is the capital of Outer Mongolia?"), some existing
-knowledge of a database populated with relevant data, and produce a SQL
+familiar with [SQL (Structured Query
+Language)](https://en.wikipedia.org/wiki/SQL). When given suitable prompts and
+information about a database's schema, most LLMs can now do a reasonable job of
+generating appropriate SQL to extract the data which will answer your question.
+There are now several tools available which are designed explicitly to
+facilitate using AI in this way, enhancing the standard LLM prompts and response
+with custom agents which directly utilise additional information about the
+database schema and data to improve the quality of the response. These tools
+take a natural language query (e.g. "What is the capital of Outer Mongolia?"),
+some knowledge of a database populated with relevant data, and produce a SQL
 statement (e.g. `SELECT city FROM worldcities WHERE country = 'Mongolia' AND
 capital = 'primary'`) that will hopefully give a useful answer.
 
@@ -41,12 +47,20 @@ Let's take a look at some examples of questions, the SQL that we might obtain
 without giving the tool any extra information other than the database schema,
 and how we might improve the quality of the results. For these examples, we'll
 be using data from a climate change database which we've been working with as
-part of a tool to help people ask questions about climate change data (see
+part of a tool to help people ask questions about climate change data (see our
 [climate change data blog post](https://blog.scottlogic.com/category/ai.html)).
 We'll be restricting ourselves to fairly simple questions about populations, but
-this also requires knowledge of regions (e.g. countries and continents). The
-tool we're using for generating these queries is
-[Dataherald](https://www.dataherald.com/).
+this also requires knowledge of regions (e.g. countries and continents).
+
+The tool we're using for generating these queries is
+[Dataherald](https://www.dataherald.com/). Dataherald uses multiple techniques
+to improve the accuracy of its results, including schema scanning, table and
+column descriptions, and Golden SQLs. It also allows you to provide feedback on
+the quality of the results, which can be used to improve the quality of the
+responses over time. You can provide detailed instructions about how particular
+columns can be used (e.g. "never use this column in a WHERE clause"),and it will
+use samples of data from tables that it deems relevant to improve the accuracy
+of the responses.
 
 We'll start by doing the minimum configuration necessary: point Dataherald at
 the database, and tell it to scan the schema to discover the tables and columns
@@ -77,13 +91,9 @@ provided by Dataherald:
 
 #### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Display population growth in the United Kingdom
-SELECT year, total
-FROM population_data
-WHERE region_id = 75
-ORDER BY year;
-{% endhighlight %}
+{% highlight sql %} -- Display population growth in the United Kingdom SELECT
+year, total FROM population_data WHERE region_id = 75 ORDER BY year; {%
+endhighlight %}
 
 |year|total|
 |----|-------:|
@@ -100,14 +110,10 @@ but it's correct.
 
 #### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='red'>✘</font>
 
-{% highlight sql %}
--- Select the year and total population from the population_data table
--- Filter the results to include only the years from 1980 onwards
-SELECT year, total
-FROM public.population_data
-WHERE year >= 1980
-ORDER BY year;
-{% endhighlight %}
+{% highlight sql %} -- Select the year and total population from the
+population_data table -- Filter the results to include only the years from 1980
+onwards SELECT year, total FROM public.population_data WHERE year >= 1980 ORDER
+BY year; {% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -116,21 +122,16 @@ ORDER BY year;
 |1980|4408239|
 |…|…|
 
-Not so good. This query is giving us total population for each individual
-region and year from 1980 onwards, not just the total **global** population.
+Not so good. This query is giving us total population for each individual region
+and year from 1980 onwards, not just the total **global** population.
 
 #### Question 3: "How many centarians were there in the world in 2020?" <font color='red'>✘</font>
 
-{% highlight sql %}
--- SQL query to find the number of centenarians in the world in 2020
-SELECT SUM(age_over_100) AS centenarians_2020
-FROM population_data
-WHERE year = 2020;
-{% endhighlight %}
+{% highlight sql %} -- SQL query to find the number of centenarians in the world
+in 2020 SELECT SUM(age_over_100) AS centenarians_2020 FROM population_data WHERE
+year = 2020; {% endhighlight %}
 
-|centenarians_2020|
-|----------------:|
-|3088375|
+|centenarians_2020| |----------------:| |3088375|
 
 Over three million? That seems like a lot. Again, this isn't taking account of
 the `population_data` table containing multiple regions, so the `SUM()` will be
@@ -140,21 +141,11 @@ deliberate misspelling of 'centenarians'.
 
 #### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Compare the population of the US and China from 1970 to 2010
-SELECT
-    year,
-    SUM(CASE WHEN region_id = 39 THEN total ELSE 0 END) AS china_population,
-    SUM(CASE WHEN region_id = 224 THEN total ELSE 0 END) AS us_population
-FROM
-    population_data
-WHERE
-    year BETWEEN 1970 AND 2010
-GROUP BY
-    year
-ORDER BY
-    year;
-{% endhighlight %}
+{% highlight sql %} -- Compare the population of the US and China from 1970 to
+2010 SELECT year, SUM(CASE WHEN region_id = 39 THEN total ELSE 0 END) AS
+china_population, SUM(CASE WHEN region_id = 224 THEN total ELSE 0 END) AS
+    us_population FROM population_data WHERE year BETWEEN 1970 AND 2010 GROUP BY
+    year ORDER BY year; {% endhighlight %}
 
 |year|china_population|us_population|
 |----|----------------|-------------|
@@ -176,13 +167,9 @@ of the tables and columns.
 
 #### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Display population growth in Britain (United Kingdom)
-SELECT year, total
-FROM public.population_data
-WHERE region_id = 75
-ORDER BY year;
-{% endhighlight %}
+{% highlight sql %} -- Display population growth in Britain (United Kingdom)
+SELECT year, total FROM public.population_data WHERE region_id = 75 ORDER BY
+year; {% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -191,20 +178,16 @@ ORDER BY year;
 |1952|50484812|
 |…|…|
 
-The same query (and results) as before, but with schema information included. We've also been
-provided with a better comment explaining the use of United Kingdom instead of
-Britain.
+The same query (and results) as before, but with schema information included.
+We've also been provided with a better comment explaining the use of United
+Kingdom instead of Britain.
 
 #### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='red'>✘</font>
 
-{% highlight sql %}
--- Select the year and the sum of the total population for each year from 1980 onwards
-SELECT year, SUM(total) AS global_population
-FROM population_data
-WHERE year >= 1980
-GROUP BY year
-ORDER BY year;
-{% endhighlight %}
+{% highlight sql %} -- Select the year and the sum of the total population for
+each year from 1980 onwards SELECT year, SUM(total) AS global_population FROM
+population_data WHERE year >= 1980 GROUP BY year ORDER BY year; {% endhighlight
+%}
 
 |year|global_population|
 |----|----------------:|
@@ -218,16 +201,11 @@ the total population of all defined regions, not just the global population.
 
 #### Question 3: "How many centarians were there in the world in 2020?" <font color='red'>✘</font>
 
-{% highlight sql %}
--- SQL query to find the number of centenarians in the world in 2020
-SELECT SUM(age_over_100) AS centenarians_2020
-FROM public.population_data
-WHERE year = 2020;
-{% endhighlight %}
+{% highlight sql %} -- SQL query to find the number of centenarians in the world
+in 2020 SELECT SUM(age_over_100) AS centenarians_2020 FROM
+public.population_data WHERE year = 2020; {% endhighlight %}
 
-|centenarians_2020|
-|----------------:|
-|3088375|
+|centenarians_2020| |----------------:| |3088375|
 
 Apart from the inclusion of the schema name, this is exactly the same as before.
 We still need to provide some more information about this kind of question to
@@ -235,21 +213,11 @@ get an accurate answer.
 
 #### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Compare the population of the US and China from 1970 to 2010
-SELECT
-    year,
-    SUM(CASE WHEN region_id = 39 THEN total ELSE 0 END) AS china_population,
-    SUM(CASE WHEN region_id = 224 THEN total ELSE 0 END) AS us_population
-FROM
-    population_data
-WHERE
-    year BETWEEN 1970 AND 2010
-GROUP BY
-    year
-ORDER BY
-    year;
-{% endhighlight %}
+{% highlight sql %} -- Compare the population of the US and China from 1970 to
+2010 SELECT year, SUM(CASE WHEN region_id = 39 THEN total ELSE 0 END) AS
+china_population, SUM(CASE WHEN region_id = 224 THEN total ELSE 0 END) AS
+    us_population FROM population_data WHERE year BETWEEN 1970 AND 2010 GROUP BY
+    year ORDER BY year; {% endhighlight %}
 
 |year|china_population|us_population|
 |----|---------------:|------------:|
@@ -270,17 +238,15 @@ Previously we'd only told Dataherald that the `region_id` column was a foreign
 key to the `region` table, but we hadn't give it any further information. Let's
 add this description and see if it helps:
 
-```"description": "The ID of the region which this information relates to. This relates to entries in the region table, and may be an individual country, a group of countries, north or south hemisphere, or the entire world."```
+```"description": "The ID of the region which this information relates to. This
+relates to entries in the region table, and may be an individual country, a
+group of countries, north or south hemisphere, or the entire world."```
 
 ### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Retrieve the population growth in the United Kingdom
-SELECT year, total
-FROM public.population_data
-WHERE region_id = 75
-ORDER BY year;
-{% endhighlight %}
+{% highlight sql %} -- Retrieve the population growth in the United Kingdom
+SELECT year, total FROM public.population_data WHERE region_id = 75 ORDER BY
+year; {% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -297,13 +263,10 @@ We could probably address this using another Golden SQL.
 
 ### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Retrieve global population data from 1980 onwards for the region_id corresponding to "World"
-SELECT year, total
-FROM public.population_data
-WHERE region_id = 164 AND year >= 1980
-ORDER BY year;
-{% endhighlight %}
+{% highlight sql %} -- Retrieve global population data from 1980 onwards for the
+region_id corresponding to "World" SELECT year, total FROM
+public.population_data WHERE region_id = 164 AND year >= 1980 ORDER BY year; {%
+endhighlight %}
 
 |year|total|
 |----|----:|
@@ -319,16 +282,11 @@ regions, and it understands that the global population is represented by the
 
 ### Question 3: "How many centarians were there in the world in 2020?" <font color='red'>✘</font>
 
-{% highlight sql %}
--- SQL query to find the number of centenarians in the world in 2020
-SELECT SUM(age_over_100) AS centenarians_2020
-FROM public.population_data
-WHERE year = 2020;
-{% endhighlight %}
+{% highlight sql %} -- SQL query to find the number of centenarians in the world
+in 2020 SELECT SUM(age_over_100) AS centenarians_2020 FROM
+public.population_data WHERE year = 2020; {% endhighlight %}
 
-|centenarians_2020|
-|----------------:|
-|3088375|
+|centenarians_2020| |----------------:| |3088375|
 
 Despite getting the answer to Question 2 correct now, we're still getting the
 same incorrect answer here. Hopefully a Golden SQL will help with this, if we
@@ -336,21 +294,13 @@ give an appropriate example.
 
 ### Question 4: "Compare US population vs China population 1970-2010" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Compare the population of the US and China from 1970 to 2010
-SELECT
-    year,
-    SUM(CASE WHEN region_id = 39 THEN total ELSE 0 END) AS china_population, -- Population of China
-    SUM(CASE WHEN region_id = 224 THEN total ELSE 0 END) AS us_population -- Population of the United States
-FROM
-    public.population_data
-WHERE
-    year BETWEEN 1970 AND 2010 -- Filter for the years 1970 to 2010
-GROUP BY
-    year -- Group by year to get annual population data
-ORDER BY
-    year; -- Order the results by year
-{% endhighlight %}
+{% highlight sql %} -- Compare the population of the US and China from 1970 to
+2010 SELECT year, SUM(CASE WHEN region_id = 39 THEN total ELSE 0 END) AS
+china_population, -- Population of China SUM(CASE WHEN region_id = 224 THEN
+    total ELSE 0 END) AS us_population -- Population of the United States FROM
+    public.population_data WHERE year BETWEEN 1970 AND 2010 -- Filter for the
+    years 1970 to 2010 GROUP BY year -- Group by year to get annual population
+data ORDER BY year; -- Order the results by year {% endhighlight %}
 
 |year|china_population|us_population|
 |----|---------------:|------------:|
@@ -371,31 +321,21 @@ relationship between tables, by means of a Golden SQL statement.
 
 > Question:
 >
-> *What percentage of the global population was under 15 in each year
-> of the 1970s?*
+> *What percentage of the global population was under 15 in each year of the
+> 1970s?*
 >
 > Answer:
 >
-> ```select year, (pd.age_under_15::decimal / pd.total) * 100 as percent_under_15 from public.population_data pd inner join public.region r on pd.region_id = r.id and name = 'World' where year between 1970 and 1979;```
+> ```select year, (pd.age_under_15::decimal / pd.total) * 100 as
+> percent_under_15 from public.population_data pd inner join public.region r on
+> pd.region_id = r.id and name = 'World' where year between 1970 and 1979;```
 
 #### Question 1: "Display population growth in Britain" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Select the year and total population for the United Kingdom to display population growth
-SELECT
-    pd.year,
-    pd.total
-FROM
-    public.population_data pd
-INNER JOIN
-    public.region r
-ON
-    pd.region_id = r.id
-WHERE
-    r.name = 'United Kingdom'
-ORDER BY
-    pd.year;
-{% endhighlight %}
+{% highlight sql %} -- Select the year and total population for the United
+Kingdom to display population growth SELECT pd.year, pd.total FROM
+public.population_data pd INNER JOIN public.region r ON pd.region_id = r.id
+    WHERE r.name = 'United Kingdom' ORDER BY pd.year; {% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -410,23 +350,10 @@ likely to be a more efficient method for more complicated scenarios.
 
 #### Question 2: "Show me a line chart with the global population from 1980 onwards" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Select the year and total population from 1980 onwards for the global population
-SELECT
-    pd.year,
-    pd.total
-FROM
-    public.population_data pd
-INNER JOIN
-    public.region r
-ON
-    pd.region_id = r.id
-WHERE
-    r.name = 'World'
-    AND pd.year >= 1980
-ORDER BY
-    pd.year;
-{% endhighlight %}
+{% highlight sql %} -- Select the year and total population from 1980 onwards
+for the global population SELECT pd.year, pd.total FROM public.population_data
+pd INNER JOIN public.region r ON pd.region_id = r.id WHERE r.name = 'World' AND
+    pd.year >= 1980 ORDER BY pd.year; {% endhighlight %}
 
 |year|total|
 |----|----:|
@@ -441,17 +368,12 @@ the 'World' region.
 
 #### Question 3: "How many centarians were there in the world in 2020?" <font color='green'>✔</font>
 
-{% highlight sql %}
--- Select the number of centenarians in the world in 2020
-SELECT pd.age_over_100
-FROM public.population_data pd
-INNER JOIN public.region r ON pd.region_id = r.id
-WHERE r.name = 'World' AND pd.year = 2020;
-{% endhighlight %}
+{% highlight sql %} -- Select the number of centenarians in the world in 2020
+SELECT pd.age_over_100 FROM public.population_data pd INNER JOIN public.region r
+ON pd.region_id = r.id WHERE r.name = 'World' AND pd.year = 2020; {%
+endhighlight %}
 
-|age_over_100|
-|-----------:|
-|547543|
+|age_over_100| |-----------:| |547543|
 
 Success! The Golden SQL we provided appears to have helped Dataherald comprehend
 how to filter the results here, so we only get the centenarians for the 'World'
@@ -459,24 +381,11 @@ region in 2020.
 
 #### Question 4: "Compare US population vs China population 1970-2010" <font color='red'>✘</font>
 
-{% highlight sql %}
--- SQL query to compare the populations of the US and China from 1970 to 2010
-SELECT
-    r.name AS country,
-    pd.year,
-    pd.total AS population
-FROM
-    public.population_data pd
-INNER JOIN
-    public.region r
-ON
-    pd.region_id = r.id
-WHERE
-    r.name IN ('United States', 'China')
-    AND pd.year BETWEEN 1970 AND 2010
-ORDER BY
-    pd.year, r.name;
-{% endhighlight %}
+{% highlight sql %} -- SQL query to compare the populations of the US and China
+from 1970 to 2010 SELECT r.name AS country, pd.year, pd.total AS population FROM
+public.population_data pd INNER JOIN public.region r ON pd.region_id = r.id
+    WHERE r.name IN ('United States', 'China') AND pd.year BETWEEN 1970 AND 2010
+    ORDER BY pd.year, r.name; {% endhighlight %}
 
 |country|year|population|
 |-------|----|---------:|
@@ -541,5 +450,5 @@ of AI systems and provide test cases where the answers can be evaluated to
 ensure they are sensible.
 
 Scott Logic have a wealth of experience in prompt engineering and testing
-practices to help you get the most out of your AI tools and investment. If
-you'd like to know more about how we can help you, please get in touch.
+practices to help you get the most out of your AI tools and investment. If you'd
+like to know more about how we can help you, please get in touch.
